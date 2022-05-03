@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/lib/codemirror.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/hint/show-hint.css" />
+
+<!-- Main -->
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/lib/codemirror.js"></script>
+
+<!-- Addons -->
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/edit/matchbrackets.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/hint/show-hint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/hint/sql-hint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/fold/xml-fold.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/edit/matchtags.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/mode/simple.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/addon/mode/multiplex.js"></script>
+
+<!-- Modes -->
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/javascript/javascript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/css/css.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/sql/sql.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/vbscript/vbscript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/xml/xml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/htmlmixed/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/markdown/markdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/clike/clike.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.2/mode/php/php.js"></script>
+
+<style>
+	body {
+		margin: 0px;
+		height:100%;
+		font-size: 13px;
+	}
+	.CodeMirror {
+		height:100%;
+	}
+	.CodeMirror-gutter-elt:not(.CodeMirror-linenumber) {
+		left:5px !important;
+	}
+</style>
+{codemirror_textbox}
+<script>
+window.codeMirror = {};
+window.isDirty = false;
+window.save = false;
+
+function createCodemirror(){
+    var contentType = document.querySelector("#code").dataset.type;
+	var mode = {};
+	
+	switch(contentType) {
+		case "html":
+			mode = {name: "htmlmixed"};
+		break;
+		
+		case "css":
+			mode = {name: "css"};
+		break;
+		
+		case "javascript":
+			mode = {name: "javascript"};
+		break;
+		
+		case "sql":
+			mode = {name: "text/x-mariadb"};
+		break;
+		
+		case "markdown":
+			mode = {name: "markdown"};
+		break;
+		
+		case "php":
+			mode = {name: "text/x-php"};
+		break;
+	}
+	
+	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+		mode: mode,
+		gutters: ["CodeMirror-linenumbers", "breakpoints"],
+		selectionPointer: true,
+		lineNumbers: true,
+		matchBrackets : true,
+		autofocus: true,
+		matchTags: {bothTags: true},
+		lineWrapping: true,
+		indentWithTabs: true,
+		smartIndent: true,
+		tabSize: 4,
+		indentUnit: 3,
+		styleActiveLine: true,
+		extraKeys: {
+			"Ctrl-S": function(instance) { 
+				window.save = true;
+			},
+			"'@'": completeAfter
+		}      
+	});
+
+	editor.on("change", function(){
+		window.isDirty = true;
+	});
+	
+	window.codeMirror = editor;
+}
+
+var autoCompleteOptions = {
+	hint: function() {
+	  return {
+		from: editor.getDoc().getCursor(),
+		  to: editor.getDoc().getCursor(),
+		list: ['auth', 'include','if','else','endif','foreach','endforeach','translate','form','image']
+	  }
+	}
+};
+function completeAfter(cm, pred) {
+	var cur = cm.getCursor();
+	if (!pred || pred()) setTimeout(function() {
+		if (!cm.state.completionActive)
+
+		cm.showHint(autoCompleteOptions);
+	}, 100);
+	return CodeMirror.Pass;
+}
+window.onload = function() {
+	createCodemirror();
+};
+
+function JumpToLine(line) { 
+	codeMirror.setCursor(line - 1);
+} 
+
+function IsSaved(){
+	window.save = false;
+	window.isDirty = false;
+}
+
+function MustBeSaved(){
+	return window.save;
+}
+
+function IsChanged(){
+	return window.isDirty;
+}
+
+function GetContent(){
+    return codeMirror.getValue();
+}
+
+function ClearBookmarks(){
+	document.querySelectorAll(".CodeMirror-gutter-elt div").forEach(function(element, index){
+		element.remove()
+	});	
+}
+
+function AddBookmark(line){
+	var marker = document.createElement("div");
+
+	marker.style.color = "#822";
+	marker.innerHTML = "&bull;";
+
+	editor.setGutterMarker(editor.getCursor().line, "breakpoints", marker);
+}
+</script>

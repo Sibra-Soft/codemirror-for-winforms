@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>CodeMirrorForWinforms</id>
+    <version>1.0.0</version>
+    <authors>Alex van den Berg</authors>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <icon>logo-codemirror.png</icon>
+    <projectUrl>https://github.com/Sibra-Soft/codemirror-for-winforms</projectUrl>
+    <description>Library that makes it possible to use CodeMirror in Winforms applications</description>
+    <releaseNotes>Inital release</releaseNotes>
+    <copyright>$copyright$</copyright>
+    <tags>Sibra-Soft Winforms</tags>
+    <dependencies>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="SampleDependency" version="1.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

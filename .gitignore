@@ -1,0 +1,13 @@
+*.res
+/.vs/
+/_docs/
+/cache/
+*.ico
+desktop.ini
+*.mp3
+/test/
+/test-site/
+bin/
+packages/
+*.exe
+*.nupkg
